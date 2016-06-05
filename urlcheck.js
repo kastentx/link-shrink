@@ -1,27 +1,26 @@
 var exports = module.exports = {}
 
-var mongodb = require('mongodb')
-var MongoClient = mongodb.MongoClient
 var url = process.env.MONGOLAB_URI
+var mongoose = require('mongoose')
+var URL = mongoose.model('URL', {original: String, shortened: String})
 
 
 exports.checkValidity = function(myInput) {
+  insertTest()
   return myInput
 }
 
-exports.checkDb = function() {
-  // Use connect method to connect to the Server
-  MongoClient.connect(url, function (err, db) {
+var insertTest = function(callback) {
+  mongoose.connect(url)
+  
+  var test1 = new URL({original: 'www.google.com', shortened: 'www.goog.com'})
+  
+  test1.save(function (err, testObj) {
     if (err) {
-      console.log('Unable to connect to the mongoDB server. Error:', err)
-      console.log(url)
+      console.log(err)
     } else {
-      //HURRAY!! We are connected. :)
-      console.log('Connection established to', url)
-      // do some work here with the database.
-      
-      //Close connection
-      db.close()
+      console.log('successfully saved ' + testObj)
     }
   })
+  
 }
