@@ -10,7 +10,6 @@ exports.checkValidity = function(myInput) {
 }
 
 exports.checkDb = function() {
-  
   // Use connect method to connect to the Server
   MongoClient.connect(url, function (err, db) {
     if (err) {
@@ -19,8 +18,8 @@ exports.checkDb = function() {
     } else {
       //HURRAY!! We are connected. :)
       console.log('Connection established to', url)
-  
       // do some work here with the database.
+      
       //Close connection
       db.close()
     }
