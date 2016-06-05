@@ -1,0 +1,23 @@
+{
+  "name": "url-shortener",
+  "version": "0.0.0",
+  "description": " Pass in a url as a parameter and the microservice returns a shortened URL as JSON",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kastentx/url-shortener.git"
+  },
+  "author": "Nick Kasten <kastencode@gmail.com>",
+  "dependencies": {
+    "express": "~3.2.4"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "devDependencies": {},
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kastentx/url-shortener/issues"
+  },
+  "homepage": "https://github.com/kastentx/url-shortener#readme"
+}
