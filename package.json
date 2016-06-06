@@ -12,7 +12,8 @@
     "dotenv": "^2.0.0",
     "express": "~3.2.4",
     "mongodb": "^2.1.21",
-    "mongoose": "^4.4.20"
+    "mongoose": "^4.4.20",
+    "mongoose-hash": "^0.2.0"
   },
   "scripts": {
     "start": "node server.js"

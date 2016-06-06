@@ -14,10 +14,14 @@ app.get('/', function (req, res) {
   res.sendfile('index.html')
 })
 
-app.get('/:url', function (req, res) {
+app.get('/:code(/\w{6}/)', function (req, res) {
+  res.setHeader('Content-Type', 'application/json')
+  res.send(JSON.stringify(urlcheck.checkValidity(req.params.code)))
+})
+
+app.get('/^https?:\/\/\w+\.\w+\.\w+/(url)', function (req, res) {
   res.setHeader('Content-Type', 'application/json')
   res.send(JSON.stringify(urlcheck.checkValidity(req.params.url)))
-  //res.send(JSON.stringify(urlcheck.checkValidity(urlcheck.checkDb())))
 })
 
 app.listen(portNum)
