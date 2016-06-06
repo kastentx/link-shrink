@@ -14,14 +14,18 @@ app.get('/', function (req, res) {
   res.sendfile('index.html')
 })
 
-app.get('/:code(/\w{6}/)', function (req, res) {
+app.get('/*', function (req, res) {
+  var myInput = req.params[0]
+  
   res.setHeader('Content-Type', 'application/json')
-  res.send(JSON.stringify(urlcheck.checkValidity(req.params.code)))
-})
-
-app.get('/^https?:\/\/\w+\.\w+\.\w+/(url)', function (req, res) {
-  res.setHeader('Content-Type', 'application/json')
-  res.send(JSON.stringify(urlcheck.checkValidity(req.params.url)))
+  
+  if (/\w{6}$/.test(myInput)) {
+    res.send(JSON.stringify(urlcheck.checkValidity(myInput)))
+  } else if (/^https?:\/\/\w+\.?\w+\.\w+/.test(myInput)) {
+    res.send(JSON.stringify(urlcheck.checkValidity(myInput + ' - URL')))
+  } else {
+    res.send(JSON.stringify(urlcheck.checkValidity('ERROR - INVALID INPUT')))
+  }
 })
 
 app.listen(portNum)
