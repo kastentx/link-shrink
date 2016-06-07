@@ -19,7 +19,7 @@ URLSchema.plugin(hash, {
 
 URLSchema.pre('save', function(next) {
   console.log('Middleware activated for ' + this.code)
-  this.short += 'updated'
+  this.short += this.code
   next()
 })
 
@@ -42,7 +42,8 @@ exports.newUrl = function(myInput, callback) {
 exports.insertUrl = function(urlDoc) {
   
   console.log("insertURL called")
-  urlDoc.save(function (err, product, numAffected) {
+  
+  urlDoc.save(function (err, product) {
     if (err) {
       console.log(err)
     } else {
@@ -52,5 +53,7 @@ exports.insertUrl = function(urlDoc) {
     }
     console.log('inserted doc with an ID of ' + insertedID)
   })
-  return urlDoc
+  .then(function(doc) {
+    return doc
+  })
 }
