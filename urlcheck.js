@@ -8,12 +8,18 @@ var insertedID = ''
 var URLSchema = mongoose.Schema({
   code: String,
   original: String,
-  short: String
+  short: { type: String, default: 'https://url-shortener-kastentx.c9.io/' }
 })
 
 URLSchema.plugin(hash, {
   field: 'code',
   size: 3
+})
+
+URLSchema.post('save', function() {
+  console.log('Middleware activated for ' + this.code)
+  this.short += this.code
+  //this.update({},{ $set: { short: 'https://url-shortener-kastentx.c9.io/' + doc.code } })
 })
 
 // Create a Model by using the schema defined above
@@ -39,24 +45,10 @@ exports.insertUrl = function(urlDoc) {
       console.log(err)
     } else {
       console.log('successfully saved:\n' + product)
-      myCode = 'https://url-shortener-kastentx.c9.io/' + product.code
+      
       insertedID = product._id
     }
     console.log('inserted doc with an ID of ' + insertedID)
-    updateShortURL(urlDoc)
-  })
-  return urlDoc
-}
-
-var updateShortURL = function(urlDoc) {
-  URL.update({_id: insertedID}, { $set: {
-    short: myCode
-  }}, { upsert: true }, function(err, numAffected) {
-    if (err) {
-      console.log('updateShortURL Error: ' + err)
-    } else {
-      console.log(urlDoc)
-    }
   })
   return urlDoc
 }
