@@ -1,12 +1,12 @@
 var exports = module.exports = {}
-
-var dbUrl = process.env.MONGOLAB_URI
 var mongoose = require('mongoose')
 var hash = require('mongoose-hash')
+var myCode = ''
+var insertedID = ''
 
 // Create a schema for URL
 var URLSchema = mongoose.Schema({
-  code: {type: String, index: true},
+  code: String,
   original: String,
   short: String
 })
@@ -20,32 +20,43 @@ URLSchema.plugin(hash, {
 var URL = mongoose.model('URL', URLSchema)
 
 
+
+// function exports
 exports.checkValidity = function(myInput) {
   return myInput
 }
 
-var createLink = function() {
-  
+exports.newUrl = function(myInput, callback) {
+  var myUrl = new URL({original: myInput})
+  return callback(myUrl)
 }
 
-var insertTest = function() {
-  mongoose.connect(dbUrl)
-  var test1 = new URL({original: 'http://www.google.com', short: 'http://url-shortener-kastentx.c9users.io/'})
+exports.insertUrl = function(urlDoc) {
   
-  test1.save(function (err, testObj) {
+  console.log("insertURL called")
+  urlDoc.save(function (err, product, numAffected) {
     if (err) {
       console.log(err)
     } else {
-      console.log('successfully saved ' + testObj)
+      console.log('successfully saved:\n' + product)
+      myCode = 'https://url-shortener-kastentx.c9.io/' + product.code
+      insertedID = product._id
+    }
+    console.log('inserted doc with an ID of ' + insertedID)
+    updateShortURL(urlDoc)
+  })
+  return urlDoc
+}
+
+var updateShortURL = function(urlDoc) {
+  URL.update({_id: insertedID}, { $set: {
+    short: myCode
+  }}, { upsert: true }, function(err, numAffected) {
+    if (err) {
+      console.log('updateShortURL Error: ' + err)
+    } else {
+      console.log(urlDoc)
     }
   })
-  /*
-  var db = mongoose.connection
-  
-  db.on('error', console.error.bind(console, 'connection error:'))
-  db.once('open', function() {
-    console.log("Connected to DB")
-  //do operations which involve interacting with DB.
-  })
-  */
+  return urlDoc
 }
