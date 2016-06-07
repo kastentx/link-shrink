@@ -16,11 +16,13 @@ URLSchema.plugin(hash, {
   size: 3
 })
 
-URLSchema.post('save', function() {
+
+URLSchema.pre('save', function(next) {
   console.log('Middleware activated for ' + this.code)
-  this.short += this.code
-  //this.update({},{ $set: { short: 'https://url-shortener-kastentx.c9.io/' + doc.code } })
+  this.short += 'updated'
+  next()
 })
+
 
 // Create a Model by using the schema defined above
 var URL = mongoose.model('URL', URLSchema)
