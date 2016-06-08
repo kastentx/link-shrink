@@ -30,7 +30,7 @@ app.get('/*', function (req, res) {
     res.send(JSON.stringify('code'))
     
   // CREATE A NEW URL ENTRY
-  } else if (/^https?:\/\/\w+\.?\w+\.\w+/.test(myInput)) {
+  } else if (/^https?:\/\/\w+(?:[\/\-\.]?\w+)*\.\w+$/.test(myInput)) {
     var myUrl = new URL({original: myInput})
     
     myUrl.save(function (err, product) {
