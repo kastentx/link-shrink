@@ -16,31 +16,22 @@ URLSchema.plugin(hash, {
   size: 3
 })
 
-
 URLSchema.pre('save', function(next) {
   console.log('Middleware activated for ' + this.code)
   this.short += this.code
   next()
 })
 
-
 // Create a Model by using the schema defined above
 var URL = mongoose.model('URL', URLSchema)
 
-
-
 // function exports
-exports.checkValidity = function(myInput) {
-  return myInput
-}
-
-exports.newUrl = function(myInput, callback) {
+exports.newUrl = function(myInput) {
   var myUrl = new URL({original: myInput})
-  return callback(myUrl)
+  return insertUrl(myUrl, myCallback)
 }
 
-exports.insertUrl = function(urlDoc) {
-  
+var insertUrl = function(urlDoc, success) {
   console.log("insertURL called")
   
   urlDoc.save(function (err, product) {
@@ -52,8 +43,14 @@ exports.insertUrl = function(urlDoc) {
       insertedID = product._id
     }
     console.log('inserted doc with an ID of ' + insertedID)
+  }).then(function(product) {
+    console.log('at the end of then')
+    success() 
   })
-  .then(function(doc) {
-    return doc
-  })
+  console.log('here is the last line')
+
+}
+
+var myCallback = function() {
+  console.log('all up in the callback')
 }

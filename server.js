@@ -4,8 +4,8 @@
 
 require('dotenv').config()
 
-var urlcheck = require('./urlcheck.js')
 var mongoose = require('mongoose')
+var hash = require('mongoose-hash')
 var express = require('express')
 var app = express()
 var portNum = process.env.PORT
@@ -15,23 +15,72 @@ var dbUrl = process.env.MONGOLAB_URI
 mongoose.connect(dbUrl)
 var db = mongoose.connection
 
+// display landing page if no input given
 app.get('/', function (req, res) {
   res.sendfile('index.html')
 })
 
+// take action based on the type of input
 app.get('/*', function (req, res) {
-  
   var myInput = req.params[0]
-  
   res.setHeader('Content-Type', 'application/json')
   
+  // RETRIEVE A SHORTENED URL
   if (/\w{6}$/.test(myInput)) {
-    res.send(JSON.stringify(urlcheck.checkValidity(myInput)))
+    res.send(JSON.stringify('code'))
+    
+  // CREATE A NEW URL ENTRY
   } else if (/^https?:\/\/\w+\.?\w+\.\w+/.test(myInput)) {
-    res.send(JSON.stringify(urlcheck.checkValidity(urlcheck.newUrl(myInput, urlcheck.insertUrl))))
+    var myUrl = new URL({original: myInput})
+    
+    myUrl.save(function (err, product) {
+      if (err) {
+        console.log(err)
+      } else {
+        console.log('successfully saved:\n' + product)
+      }
+    }).then(function(product) {
+      console.log('at the end of then')
+      res.send(JSON.stringify(product))
+    })    
+    
+  // DISPLAY ERROR MESSAGE WITH UNRECOGNIZED INPUT  
   } else {
-    res.send(JSON.stringify(urlcheck.checkValidity('ERROR - INVALID INPUT')))
+    res.send(JSON.stringify('ERROR - INVALID INPUT'))
   }
 })
+.listen(portNum)
 
-app.listen(portNum)
+
+
+// Create a schema for URL
+var URLSchema = mongoose.Schema({
+  code: String,
+  original: String,
+  short: { type: String, default: 'https://url-shortener-kastentx.c9.io/' }
+})
+
+// mongoose-hash plugin generates a 6-digit code for each new url
+URLSchema.plugin(hash, {
+  field: 'code',
+  size: 3
+})
+
+// after code is assigned to a new url, add it to the shortened url (output)
+URLSchema.pre('save', function(next) {
+  console.log('Middleware activated for ' + this.code)
+  this.short += this.code
+  next()
+})
+
+// only show desired fields when JSON is displayed
+URLSchema.methods.toJSON = function() {
+  var obj = this.toObject()
+  delete obj.code
+  delete obj._id
+  delete obj.__v
+  return obj
+}
+
+// Model based on the schema defined above
+var URL = mongoose.model('URL', URLSchema)
