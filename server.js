@@ -27,22 +27,26 @@ app.get('/*', function (req, res) {
   
   // RETRIEVE A SHORTENED URL
   if (/\w{6}$/.test(myInput)) {
-    res.send(JSON.stringify('code'))
+    
+    URL.findOne({ code: myInput}, function (err, doc){
+      if (err) {
+        console.log(err)
+      }
+      res.send(JSON.stringify(doc))
+    });
     
   // CREATE A NEW URL ENTRY
   } else if (/^https?:\/\/\w+(?:[\/\-\.]?\w+)*\.\w+$/.test(myInput)) {
-    var myUrl = new URL({original: myInput})
+    var myUrl = new URL({original: myInput, short: req.protocol + '://' + req.host + '/'})
     
     myUrl.save(function (err, product) {
       if (err) {
         console.log(err)
       } else {
-        console.log('successfully saved:\n' + product)
+        //console.log('successfully saved:\n' + product)
+        res.send(JSON.stringify(product))
       }
-    }).then(function(product) {
-      console.log('at the end of then')
-      res.send(JSON.stringify(product))
-    })    
+    })  
     
   // DISPLAY ERROR MESSAGE WITH UNRECOGNIZED INPUT  
   } else {
@@ -57,7 +61,7 @@ app.get('/*', function (req, res) {
 var URLSchema = mongoose.Schema({
   code: String,
   original: String,
-  short: { type: String, default: 'https://url-shortener-kastentx.c9.io/' }
+  short: String
 })
 
 // mongoose-hash plugin generates a 6-digit code for each new url
@@ -68,7 +72,7 @@ URLSchema.plugin(hash, {
 
 // after code is assigned to a new url, add it to the shortened url (output)
 URLSchema.pre('save', function(next) {
-  console.log('Middleware activated for ' + this.code)
+  //console.log('Middleware activated for ' + this.code)
   this.short += this.code
   next()
 })
