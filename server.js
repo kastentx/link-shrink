@@ -41,7 +41,7 @@ app.get('/*', function (req, res) {
     });
     
   // CREATE A NEW URL ENTRY
-  } else if (/^https?:\/\/\w+(?:[\/\-\.]?\w+)*\.\w+$/.test(myInput)) {
+  } else if (/^https?:\/\/\w+(?:[\/\-\.]?\w+)*\.\w+(?:\/\w+)*$/.test(myInput)) {
     var myUrl = new URL({original: myInput, short: req.protocol + '://' + req.host + '/'})
     
     myUrl.save(function (err, product) {
