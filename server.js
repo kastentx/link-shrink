@@ -32,7 +32,12 @@ app.get('/*', function (req, res) {
       if (err) {
         console.log(err)
       }
-      res.send(JSON.stringify(doc))
+      if (doc) {
+        res.redirect(doc.original)
+      } else {
+        res.send(JSON.stringify('No shortened URL with this address.'))  
+      }
+      
     });
     
   // CREATE A NEW URL ENTRY
@@ -43,8 +48,7 @@ app.get('/*', function (req, res) {
       if (err) {
         console.log(err)
       } else {
-        //console.log('successfully saved:\n' + product)
-        res.send(JSON.stringify(product))
+        res.send(JSON.stringify(product.short))
       }
     })  
     
@@ -77,14 +81,13 @@ URLSchema.pre('save', function(next) {
   next()
 })
 
+/*
 // only show desired fields when JSON is displayed
 URLSchema.methods.toJSON = function() {
   var obj = this.toObject()
-  delete obj.code
-  delete obj._id
-  delete obj.__v
-  return obj
+  return obj.short
 }
+*/
 
 // Model based on the schema defined above
 var URL = mongoose.model('URL', URLSchema)
