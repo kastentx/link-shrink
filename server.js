@@ -9,7 +9,7 @@ var hash = require('mongoose-hash')
 var express = require('express')
 var app = express()
 var portNum = process.env.PORT
-var dbUrl = process.env.MONGOLAB_URI
+var dbUrl = process.env.MONGODB_URI
 
 // connect to the database when app starts
 mongoose.connect(dbUrl)
